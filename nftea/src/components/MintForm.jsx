@@ -15,19 +15,30 @@ const MintForm = ({ onMintSuccess }) => {
     setError(null);
     setIsMinting(true);
 
+    console.log("1. Start minting..."); // Debug 1
     try {
       // Basic validation
       if (!formData.name.trim()) throw new Error("NFT name is required");
       if (!formData.imageURL.trim()) throw new Error("Image URL is required");
 
-      console.log("Data to mint:", formData); // Pastikan tidak ada undefined
+      // console.log("Data to mint:", formData); // Pastikan tidak ada undefined
+      console.log("2. Calling mintNFT..."); // Debug 2
       const txHash = await mintNFT(
         formData.name,
         formData.description,
         formData.imageURL
       );
       
-      onMintSuccess(txHash);
+      console.log("3. TX Success:", txHash); // Debug 3
+      console.log("4. Type of onMintSuccess:", typeof onMintSuccess); // Periksa fungsi
+      // onMintSuccess(txHash);
+      // Pastikan txHash ada
+      if (!txHash?.hash) throw new Error("No transaction hash returned");
+
+      // Eksekusi callback
+      if (typeof onMintSuccess === 'function') {
+        onMintSuccess(txHash.hash);
+      }
       setFormData({ name: '', description: '', imageURL: '' });
       
     } catch (err) {
