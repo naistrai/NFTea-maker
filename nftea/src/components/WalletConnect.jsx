@@ -1,20 +1,23 @@
 import { initProvider, getConnectedAddress } from '../utils/web3';
 
 const WalletConnect = ({ setAddress }) => {
-  const connect = async () => {
+  const connectWallet = async () => {
     try {
       await initProvider();
       const address = await getConnectedAddress();
       setAddress(address);
     } catch (error) {
-      console.error("Connection error:", error);
+      alert(`Error connecting wallet: ${error.message}`);
     }
   };
 
   return (
-    <div className="wallet-connect">
-      <button onClick={connect}>Connect Wallet</button>
-    </div>
+    <button 
+      onClick={connectWallet}
+      className="connect-button"
+    >
+      Connect Wallet
+    </button>
   );
 };
 

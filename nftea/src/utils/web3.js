@@ -1,5 +1,6 @@
 import { BrowserProvider, Contract, ethers } from 'ethers';
 import CustomNFT from '../contracts/CustomNFT.json';
+
 import { 
   CONTRACT_ADDRESS,
   NETWORK_ID,
@@ -57,3 +58,26 @@ export const getConnectedAddress = async () => {
 export const formatBalance = (balance) => {
   return parseFloat(ethers.formatEther(balance)).toFixed(4);
 };
+
+// Tambahkan fungsi-fungsi ini:
+export const setupEventListeners = (callback) => {
+  if (window.ethereum) {
+    window.ethereum.on('accountsChanged', (accounts) => {
+      callback(accounts[0] || null);
+    });
+    
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    });
+  }
+};
+
+export const removeEventListeners = () => {
+  if (window.ethereum) {
+    window.ethereum.removeAllListeners('accountsChanged');
+    window.ethereum.removeAllListeners('chainChanged');
+  }
+};
+
+// Ganti nama export untuk konsistensi
+export const onAccountsChanged = setupEventListeners;
