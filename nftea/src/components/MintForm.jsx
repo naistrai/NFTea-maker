@@ -57,120 +57,116 @@ const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-400 p-6">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
-          Mint Your NFT
-        </h2>
+    <div className="p-4 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-4">
+      <h2 className="text-xl font-semibold text-center">Mint Your NFT</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block font-semibold mb-1">NFT Name*</label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="My Awesome NFT"
+            required
+            className="w-full border rounded px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold mb-1">Description</label>
+          <textarea
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            placeholder="Describe your NFT..."
+            className="w-full border rounded px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold mb-1">Image Input Type</label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="url"
+                checked={imageInputType === 'url'}
+                onChange={() => setImageInputType('url')}
+                className="mr-2"
+              />
+              Image URL
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="file"
+                checked={imageInputType === 'file'}
+                onChange={() => setImageInputType('file')}
+                className="mr-2"
+              />
+              Upload File
+            </label>
+          </div>
+        </div>
+
+        {imageInputType === 'url' ? (
           <div>
-            <label className="text-sm font-medium text-gray-600">NFT Name*</label>
+            <label className="block font-semibold mb-1">Image URL*</label>
             <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Enter NFT name"
-              required
-              className="w-full bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-600">Description</label>
-            <textarea
-              value={formData.description}
+              type="url"
+              value={formData.imageURL}
               onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
+                setFormData({ ...formData, imageURL: e.target.value })
               }
-              placeholder="Describe your NFT..."
-              className="w-full bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 py-2"
+              placeholder="https://example.com/image.png"
+              required
+              className="w-full border rounded px-3 py-2"
             />
           </div>
-
+        ) : (
           <div>
-            <label className="text-sm font-medium text-gray-600 block mb-1">Upload Method</label>
-            <div className="flex gap-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  value="url"
-                  checked={imageInputType === 'url'}
-                  onChange={() => setImageInputType('url')}
-                  className="accent-blue-500"
-                />
-                <span>Image URL</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  value="file"
-                  checked={imageInputType === 'file'}
-                  onChange={() => setImageInputType('file')}
-                  className="accent-blue-500"
-                />
-                <span>Upload File</span>
-              </label>
-            </div>
+            <label className="block font-semibold mb-1">Upload Image*</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files[0])}
+              required
+              className="w-full"
+            />
           </div>
+        )}
 
-          {imageInputType === 'url' ? (
-            <div>
-              <label className="text-sm font-medium text-gray-600">Image URL*</label>
-              <input
-                type="url"
-                value={formData.imageURL}
-                onChange={(e) =>
-                  setFormData({ ...formData, imageURL: e.target.value })
-                }
-                placeholder="https://example.com/image.png"
-                required
-                className="w-full bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 py-2"
-              />
-            </div>
-          ) : (
-            <div>
-              <label className="text-sm font-medium text-gray-600">Upload Image*</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImageFile(e.target.files[0])}
-                required
-                className="w-full py-2"
-              />
-            </div>
-          )}
+        {error && (
+          <div className="bg-red-100 text-red-700 p-2 rounded text-sm">
+            ⚠ {error}
+          </div>
+        )}
 
-          {error && (
-            <div className="bg-red-100 text-red-700 p-3 rounded-md text-sm">
-              ⚠ {error}
-            </div>
-          )}
+        <button
+          type="submit"
+          disabled={isMinting}
+          className={`w-full rounded px-4 py-2 text-white font-semibold ${
+            isMinting
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-700'
+          }`}
+        >
+          {isMinting ? 'Minting...' : 'Mint NFT'}
+        </button>
 
-          <button
-            type="submit"
-            disabled={isMinting}
-            className={`w-full text-white font-medium py-3 rounded-xl transition ${
-              isMinting
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600'
-            }`}
+        {successTx && (
+          <div
+            className="text-center text-green-700 text-sm mt-2 cursor-pointer"
+            onClick={() =>
+              window.open(`https://sepolia.tea.xyz/tx/${successTx}`, '_blank')
+            }
           >
-            {isMinting ? 'Minting...' : 'Mint NFT →'}
-          </button>
-
-          {successTx && (
-            <div
-              className="text-center text-green-700 text-sm cursor-pointer mt-4"
-              onClick={() =>
-                window.open(`https://sepolia.tea.xyz/tx/${successTx}`, '_blank')
-              }
-            >
-              ✅ View Transaction on Block Explorer
-            </div>
-          )}
-        </form>
-      </div>
+            ✅ View Transaction
+          </div>
+        )}
+      </form>
     </div>
   );
 };
