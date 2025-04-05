@@ -1,5 +1,5 @@
 import { BrowserProvider, Contract, ethers } from 'ethers';
-import CustomNFT from '../contracts/CustomNFT.json';
+import NFTea from '../contracts/NFTea.json';
 
 let provider = null;
 let nftContract = null;
@@ -40,7 +40,7 @@ export const getNFTContract = async () => {
       const signer = await provider.getSigner();
       nftContract = new Contract(
         process.env.REACT_APP_CONTRACT_ADDRESS,
-        CustomNFT.abi,
+        NFTea.abi,
         signer
       );
       return nftContract;
