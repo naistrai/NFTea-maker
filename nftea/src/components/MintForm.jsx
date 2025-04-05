@@ -20,6 +20,7 @@ const MintForm = ({ onMintSuccess }) => {
       if (!formData.name.trim()) throw new Error("NFT name is required");
       if (!formData.imageURL.trim()) throw new Error("Image URL is required");
 
+      console.log("Data to mint:", formData); // Pastikan tidak ada undefined
       const txHash = await mintNFT(
         formData.name,
         formData.description,
