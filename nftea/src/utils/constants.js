@@ -10,7 +10,8 @@ export const BLOCK_EXPLORER_URL = "https://sepolia.tea.xyz";
 
 // Konfigurasi untuk Add Network
 export const NETWORK_CONFIG = {
-  chainId: `0x${NETWORK_ID.toString(16)}`,
+  // chainId: `0x${NETWORK_ID.toString(16)}`,
+  chainId: '0x27a0', // 0x27a0 = 10218
   chainName: NETWORK_NAME,
   nativeCurrency: {
     name: "Tea",
