@@ -1,59 +1,85 @@
 import { useState } from 'react';
-import { getNFTContract } from '../utils/web3';
+import { mintNFT } from '../utils/web3';
 
-const MintForm = ({ refreshNFTs }) => {
+const MintForm = ({ onMintSuccess }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     imageURL: ''
   });
   const [isMinting, setIsMinting] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleMint = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsMinting(true);
+
     try {
-      setIsMinting(true);
-      const contract = await getNFTContract();
-      const tx = await contract.mintNFT(
+      // Basic validation
+      if (!formData.name.trim()) throw new Error("NFT name is required");
+      if (!formData.imageURL.trim()) throw new Error("Image URL is required");
+
+      const txHash = await mintNFT(
         formData.name,
         formData.description,
         formData.imageURL
       );
-      await tx.wait();
-      refreshNFTs();
+      
+      onMintSuccess(txHash);
       setFormData({ name: '', description: '', imageURL: '' });
-    } catch (error) {
-      console.error("Minting error:", error);
+      
+    } catch (err) {
+      console.error("Minting error:", err);
+      setError(err.message || "Failed to mint NFT");
     } finally {
       setIsMinting(false);
     }
   };
 
   return (
-    <div className="mint-form-container">
-      <input
-        type="text"
-        placeholder="NFT Name"
-        value={formData.name}
-        onChange={(e) => setFormData({...formData, name: e.target.value})}
-      />
-      <textarea
-        placeholder="Description"
-        value={formData.description}
-        onChange={(e) => setFormData({...formData, description: e.target.value})}
-      />
-      <input
-        type="url"
-        placeholder="Image URL"
-        value={formData.imageURL}
-        onChange={(e) => setFormData({...formData, imageURL: e.target.value})}
-      />
+    <form onSubmit={handleSubmit} className="mint-form">
+      <div className="form-group">
+        <label>NFT Name*</label>
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({...formData, name: e.target.value})}
+          placeholder="My Awesome NFT"
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Description</label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => setFormData({...formData, description: e.target.value})}
+          placeholder="Describe your NFT..."
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Image URL*</label>
+        <input
+          type="url"
+          value={formData.imageURL}
+          onChange={(e) => setFormData({...formData, imageURL: e.target.value})}
+          placeholder="https://example.com/image.png"
+          required
+        />
+      </div>
+
+      {error && <div className="error-message">{error}</div>}
+
       <button 
-        onClick={handleMint}
+        type="submit" 
         disabled={isMinting}
+        className={`mint-button ${isMinting ? 'loading' : ''}`}
       >
         {isMinting ? 'Minting...' : 'Mint NFT'}
       </button>
-    </div>
+    </form>
   );
 };
 

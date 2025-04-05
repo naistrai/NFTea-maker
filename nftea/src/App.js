@@ -1,41 +1,47 @@
 import { useState, useEffect } from 'react';
-import { initProvider, getConnectedAddress, setupEventListeners } from './utils/web3';
+import { initProvider, getConnectedAddress, checkNetwork } from './utils/web3';
 import MintForm from './components/MintForm';
 import WalletConnect from './components/WalletConnect';
+import './App.css';
 
 function App() {
-  const [address, setAddress] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [isCorrectNetwork, setIsCorrectNetwork] = useState(false);
 
   useEffect(() => {
-    const init = async () => {
+    const checkConnection = async () => {
       try {
         await initProvider();
-        const addr = await getConnectedAddress();
-        setAddress(addr);
-        
-        // Setup event listeners
-        setupEventListeners((newAddress) => {
-          setAddress(newAddress);
-        });
+        const address = await getConnectedAddress();
+        if (address) {
+          setAccount(address);
+          const networkCorrect = await checkNetwork();
+          setIsCorrectNetwork(networkCorrect);
+        }
       } catch (error) {
-        console.error("Initialization error:", error);
+        console.log("Initial connection check error:", error);
       }
     };
 
-    init();
-
-    return () => {
-      // Cleanup listeners
-      removeEventListeners();
-    };
+    checkConnection();
   }, []);
 
+  const handleConnect = (address) => {
+    setAccount(address);
+  };
+
   return (
-    <div className="App">
-      {address ? (
+    <div className="app-container">
+      {!isCorrectNetwork && (
+        <div className="network-warning">
+          Please connect to Tea Sepolia network
+        </div>
+      )}
+      
+      {account ? (
         <MintForm />
       ) : (
-        <WalletConnect setAddress={setAddress} />
+        <WalletConnect onConnect={handleConnect} />
       )}
     </div>
   );
