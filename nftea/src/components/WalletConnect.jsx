@@ -1,13 +1,38 @@
-// src/components/WalletConnect.js
 import React from "react";
+import { NETWORK_CONFIG } from "../utils/constants";
 
 const WalletConnect = ({ onConnect }) => {
+  const switchToTeaSepolia = async () => {
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: NETWORK_CONFIG.chainId }],
+      });
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [NETWORK_CONFIG],
+          });
+        } catch (addError) {
+          console.error("Gagal menambahkan jaringan:", addError);
+        }
+      } else {
+        console.error("Gagal mengganti jaringan:", switchError);
+      }
+    }
+  };
+
   const connectWallet = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
+
+        await switchToTeaSepolia();
+
         if (accounts.length > 0) {
           onConnect(accounts[0]);
         }
