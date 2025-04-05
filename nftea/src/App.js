@@ -39,7 +39,13 @@ function App() {
       )}
       
       {account ? (
-        <MintForm />
+        // <MintForm />
+        <MintForm 
+          onMintSuccess={(txHash) => {
+            console.log("Minting success! TX:", txHash);
+            // Tambahkan logic redirect/notifikasi di sini
+          }}
+        />
       ) : (
         <WalletConnect onConnect={handleConnect} />
       )}

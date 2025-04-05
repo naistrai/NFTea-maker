@@ -58,7 +58,7 @@ export const mintNFT = async (name, description, imageURL) => {
     const contract = await getNFTContract();
     const tx = await contract.mintNFT(name, description, imageURL);
     await tx.wait();
-    return tx.hash;
+    return tx;
   } catch (error) {
     console.error("Minting error:", error);
     throw error;
