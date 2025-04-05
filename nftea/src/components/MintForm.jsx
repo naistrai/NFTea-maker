@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { mintNFT, uploadImageToImgHippo } from '../utils/web3'; // Import fungsi uploadImageToImgHippo
+import '../MintForm.css'; // Pastikan Anda membuat file CSS untuk styling
 
 const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
   const [formData, setFormData] = useState({
@@ -58,15 +59,17 @@ const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
   };
 
   return (
-    <div>
+    <div className="mint-form-container">
       <div className="wallet-info">
-        <p>Connected Wallet: {connectedWallet}</p>
+        <p>Connected Wallet: <span className="wallet-address">{connectedWallet}</span></p>
         <button onClick={onLogout} className="logout-button">
           Logout
         </button>
       </div>
 
       <form onSubmit={handleSubmit} className="mint-form">
+        <h2 className="form-title">Mint Your NFT</h2>
+
         <div className="form-group">
           <label>NFT Name*</label>
           <input
@@ -127,6 +130,14 @@ const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
 
         {error && <div className="error-message">{error}</div>}
 
+        <button
+          type="submit"
+          disabled={isMinting}
+          className={`mint-button ${isMinting ? 'loading' : ''}`}
+        >
+          {isMinting ? 'Minting...' : 'Mint NFT'}
+        </button>
+
         {successTx && (
           <div
             className="success-message"
@@ -138,14 +149,6 @@ const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
             ✅ Transaction successful! Click here to view on block explorer.
           </div>
         )}
-
-        <button
-          type="submit"
-          disabled={isMinting}
-          className={`mint-button ${isMinting ? 'loading' : ''}`}
-        >
-          {isMinting ? 'Minting...' : 'Mint NFT'}
-        </button>
       </form>
     </div>
   );
