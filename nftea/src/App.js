@@ -41,10 +41,9 @@ function App() {
       {account ? (
         // <MintForm />
         <MintForm 
-          onMintSuccess={(txHash) => {
-            console.log("Minting success! TX:", txHash);
-            // Tambahkan logic redirect/notifikasi di sini
-          }}
+          onMintSuccess={(txHash) => console.log("Minting success! TX:", txHash)}
+          onLogout={() => setAccount(null)}
+          connectedWallet={account}
         />
       ) : (
         <WalletConnect onConnect={handleConnect} />
