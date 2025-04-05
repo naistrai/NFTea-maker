@@ -40,19 +40,11 @@ function App() {
       
       {account ? (
         // <MintForm />
-        // <MintForm 
-        //   onMintSuccess={(txHash) => console.log("Minting success! TX:", txHash)}
-        //   onLogout={() => setAccount(null)}
-        //   connectedWallet={account}
-        // />
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400">
-          <MintForm 
-            onMintSuccess={(txHash) => console.log("Minting success! TX:", txHash)}
-            onLogout={() => setAccount(null)}
-            connectedWallet={account}
-          />
-        </div>
-
+        <MintForm 
+          onMintSuccess={(txHash) => console.log("Minting success! TX:", txHash)}
+          onLogout={() => setAccount(null)}
+          connectedWallet={account}
+        />
       ) : (
         <WalletConnect onConnect={handleConnect} />
       )}
