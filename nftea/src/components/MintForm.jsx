@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { mintNFT, getConnectedAddress } from '../utils/web3';
+import { mintNFT, uploadImageToImgHippo } from '../utils/web3'; // Import fungsi uploadImageToImgHippo
 
 const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
   const [formData, setFormData] = useState({
@@ -9,37 +9,46 @@ const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
   });
   const [isMinting, setIsMinting] = useState(false);
   const [error, setError] = useState(null);
-  const [successTx, setSuccessTx] = useState(null); // State untuk menyimpan hash transaksi sukses
+  const [successTx, setSuccessTx] = useState(null);
+  const [imageInputType, setImageInputType] = useState('url'); // State untuk tipe input gambar
+  const [imageFile, setImageFile] = useState(null); // State untuk file gambar
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setIsMinting(true);
-    setSuccessTx(null); // Reset notifikasi sukses
+    setSuccessTx(null);
 
     try {
       // Basic validation
       if (!formData.name.trim()) throw new Error("NFT name is required");
-      if (!formData.imageURL.trim()) throw new Error("Image URL is required");
+
+      let imageURL = formData.imageURL;
+
+      // Jika input berupa file, unggah ke ImgHippo
+      if (imageInputType === 'file') {
+        if (!imageFile) throw new Error("Image file is required");
+        const uploadedImageURL = await uploadImageToImgHippo(imageFile);
+        if (!uploadedImageURL) throw new Error("Failed to upload image");
+        imageURL = uploadedImageURL;
+      } else if (!formData.imageURL.trim()) {
+        throw new Error("Image URL is required");
+      }
 
       const txReceipt = await mintNFT(
         formData.name,
         formData.description,
-        formData.imageURL
+        imageURL
       );
-      
-      // Pastikan txHash ada
+
       if (!txReceipt?.hash) throw new Error("No transaction hash returned");
 
-      // Eksekusi callback
       if (typeof onMintSuccess === 'function') {
         onMintSuccess(txReceipt.hash);
       }
       setFormData({ name: '', description: '', imageURL: '' });
-
-      // Set hash transaksi sukses
+      setImageFile(null); // Reset file input
       setSuccessTx(txReceipt.hash);
-      
     } catch (err) {
       console.error("Minting error:", err);
       setError(err.message || "Failed to mint NFT");
@@ -63,7 +72,7 @@ const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
           <input
             type="text"
             value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="My Awesome NFT"
             required
           />
@@ -73,36 +82,65 @@ const MintForm = ({ onMintSuccess, onLogout, connectedWallet }) => {
           <label>Description</label>
           <textarea
             value={formData.description}
-            onChange={(e) => setFormData({...formData, description: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             placeholder="Describe your NFT..."
           />
         </div>
 
         <div className="form-group">
-          <label>Image URL*</label>
-          <input
-            type="url"
-            value={formData.imageURL}
-            onChange={(e) => setFormData({...formData, imageURL: e.target.value})}
-            placeholder="https://example.com/image.png"
-            required
-          />
+          <label>Image Input Type</label>
+          <select
+            value={imageInputType}
+            onChange={(e) => setImageInputType(e.target.value)}
+          >
+            <option value="url">Image URL</option>
+            <option value="file">Upload File</option>
+          </select>
         </div>
+
+        {imageInputType === 'url' ? (
+          <div className="form-group">
+            <label>Image URL*</label>
+            <input
+              type="url"
+              value={formData.imageURL}
+              onChange={(e) =>
+                setFormData({ ...formData, imageURL: e.target.value })
+              }
+              placeholder="https://example.com/image.png"
+              required
+            />
+          </div>
+        ) : (
+          <div className="form-group">
+            <label>Upload Image*</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files[0])}
+              required
+            />
+          </div>
+        )}
 
         {error && <div className="error-message">{error}</div>}
 
         {successTx && (
-          <div 
+          <div
             className="success-message"
-            onClick={() => window.open(`https://sepolia.tea.xyz/tx/${successTx}`, '_blank')}
+            onClick={() =>
+              window.open(`https://sepolia.tea.xyz/tx/${successTx}`, '_blank')
+            }
             style={{ cursor: 'pointer' }}
           >
             ✅ Transaction successful! Click here to view on block explorer.
           </div>
         )}
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isMinting}
           className={`mint-button ${isMinting ? 'loading' : ''}`}
         >

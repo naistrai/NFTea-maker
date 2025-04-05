@@ -71,3 +71,28 @@ export const checkNetwork = async () => {
   const chainId = await window.ethereum.request({ method: 'eth_chainId' });
   return parseInt(chainId, 16) === parseInt(process.env.REACT_APP_NETWORK_ID);
 };
+
+// Fungsi untuk mengupload gambar
+export const uploadImageToImgHippo = async (file) => {
+  const apiKey = process.env.REACT_APP_IMGHIPPO_API; // Ganti dengan API key Anda
+  const formData = new FormData();
+  formData.append('api_key', apiKey);
+  formData.append('file', file);
+
+  try {
+    const response = await fetch('https://api.imghippo.com/v1/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      return data.data.url; // URL gambar yang diunggah
+    } else {
+      throw new Error(data.error.message || 'Failed to upload image');
+    }
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+};
