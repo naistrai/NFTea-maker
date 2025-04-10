@@ -83,7 +83,7 @@ export function CreateNFT() {
       }
 
       // Add API key and title
-      formData.append("api_key", NEXT_PUBLIC_APP_IMGHIPPO_API)
+      formData.append("api_key", '861883b0f6de0c696a0c1b9c7fa1c66a')
       formData.append("title", title)
 
       const uploadResponse = await fetch("https://api.imghippo.com/v1/upload", {
