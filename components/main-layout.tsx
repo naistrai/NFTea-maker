@@ -51,14 +51,21 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
             </CardContent>
           </Card>
         ) : (
-          <Tabs defaultValue="create" className="w-full">
-            <TabsList className="grid w-full grid-cols-1">
+          <Tabs defaultValue={pathname === "/collection" ? "collection" : "create"} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger
                 value="create"
                 onClick={() => router.push("/")}
                 className="data-[state=active]:bg-teal-600 data-[state=active]:text-white"
               >
                 Create NFT
+              </TabsTrigger>
+              <TabsTrigger
+                value="collection"
+                onClick={() => router.push("/collection")}
+                className="data-[state=active]:bg-teal-600 data-[state=active]:text-white"
+              >
+                My Collection
               </TabsTrigger>
             </TabsList>
           </Tabs>

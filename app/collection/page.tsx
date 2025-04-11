@@ -1,15 +1,10 @@
-"use client"
-
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { MainLayout } from "@/components/main-layout"
+import { NFTCollection } from "@/components/nft-collection"
 
 export default function CollectionPage() {
-  const router = useRouter()
-
-  useEffect(() => {
-    // Redirect to home page since collection is disabled
-    router.push("/")
-  }, [router])
-
-  return null
+  return (
+    <MainLayout>
+      <NFTCollection />
+    </MainLayout>
+  )
 }
